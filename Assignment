@@ -1,0 +1,160 @@
+--***********************
+-- Name: Dil Humyra Sultana Borna
+-- ID: 139166227
+-- Date: 26-10-2023
+-- Purpose: Assignment 01 DBS211
+-- ***********************
+
+--Q1 SOLUTION --
+SELECT
+   emp.employeenumber as "Employee Number",
+   emp.lastname || ', ' || emp.firstname as "Employee Name",
+   off.phone as "Phone",
+   emp.extension as "Extension",
+   off.city as "City",
+   CASE
+      WHEN
+         managers.employeenumber IS NOT NULL 
+      THEN
+         TO_CHAR(managers.employeenumber) 
+      ELSE
+         'Unknown' 
+   END
+   as "Manager ID", NVL(CONCAT(managers.lastname, managers.firstname), 'Unknown') as "Manager Name" 
+FROM
+   employees emp 
+   INNER JOIN
+      offices off 
+      ON emp.officecode = off.officecode 
+   LEFT JOIN
+      employees managers 
+      ON emp.reportsto = managers.employeenumber 
+WHERE
+   emp.employeenumber = 1002;
+   
+--Q2 SOLUTION --
+SELECT
+   emp.employeenumber as "Employee Number",
+   emp.firstname || ' ' || emp.lastname as "Employee Name",
+   off.phone as "Phone",
+   emp.extension as "Extension",
+   off.city as "City" 
+FROM
+   employees emp 
+   INNER JOIN
+      offices off 
+      ON emp.officecode = off.officecode 
+WHERE
+   off.city IN 
+   (
+      'NYC',
+      'Tokyo',
+      'Paris'
+   )
+ORDER BY
+   off.city,
+   emp.employeenumber;
+   
+--Q3 SOLUTION --
+SELECT
+   emp.employeenumber as "Employee Number",
+   emp.lastname || ', ' || emp.firstname as "Employee Name",
+   off.phone as "Phone",
+   emp.extension as "Extension",
+   off.city as "City",
+   emp.reportsto as "Manager ID",
+   manager.firstname || ' ' || manager.lastname as "Manager Name"
+FROM
+   employees emp 
+   INNER JOIN
+      offices off 
+      ON emp.officecode = off.officecode
+   LEFT JOIN
+      employees manager
+      ON emp.reportsto = manager.employeenumber
+WHERE
+   off.city IN 
+   (
+      'NYC',
+      'Tokyo',
+      'Paris'
+   )
+ORDER BY
+   off.city,
+   emp.employeenumber;
+   
+--Q4 SOLUTION --
+SELECT
+   m.employeenumber AS "Manager ID",
+   m.firstname || ' ' || m.lastname AS "Manager Name",
+   o.country,
+   CASE
+      When
+         m.reportsto IS NULL 
+      THEN
+         'Does not report to anyone' 
+      Else
+         'Reports to ' || rm.firstname || ' ' || rm.lastname || '(' || rm.jobtitle || ')' 
+   END
+   AS "Reports to" 
+FROM
+   employees m 
+   JOIN
+      offices o 
+      ON m.officecode = o.officecode 
+   LEFT JOIN
+      employees rm 
+      ON m.reportsto = rm.employeenumber 
+WHERE
+   m.employeenumber IN 
+   (
+      SELECT
+         reportsto 
+      FROM
+         employees 
+   )
+ORDER BY
+   "Manager ID";
+   
+--Q5 Solution --
+SELECT
+   c.customernumber,
+   c.customername,
+   od.productcode,
+   p.msrp AS "OLD Price",
+   CASE
+      WHEN
+         od.quantityordered > 55 
+      THEN
+         ROUND(p.msrp * 0.9, 2)
+      ELSE
+         p.msrp 
+   END
+   AS "New Price" 
+FROM
+   customers c 
+   JOIN
+      orders o 
+      ON c.customernumber = o.customernumber 
+   JOIN
+      orderdetails od 
+      ON o.ordernumber = od.ordernumber 
+   JOIN
+      products p 
+      ON od.productcode = p.productcode 
+WHERE
+   p.productvendor = 'Exoto Designs' 
+   AND od.quantityordered > 55 
+ORDER BY
+   c.customernumber;
+
+--Q6 Solution --
+SELECT
+   MAX(od1.priceeach) AS "Maximum Price" 
+FROM
+   orderdetails od1 
+   JOIN
+      orderdetails od2 
+      ON od1.productcode = od2.productcode 
+Where
+   od1.productcode = 'S10_1678';
